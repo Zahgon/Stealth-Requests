@@ -7,8 +7,7 @@ from curl_cffi.requests.session import HttpMethod
 
 
 def request(method: HttpMethod, url: str, *args, **kwargs) -> StealthResponse:
-    with StealthSession() as s:
-        return s.request(method, url, *args, **kwargs)
+    pass
 
 
 head = partial(request, 'HEAD')

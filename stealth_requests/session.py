@@ -49,26 +49,7 @@ class StealthSession(BaseStealthSession, Session):
         super().__init__(*args, **kwargs)
 
     def request(self, method: HttpMethod, url: str, *args, retry: int = 0, **kwargs) -> StealthResponse:
-        assert retry >= 0
-
-        referer = {'Referer': self.last_request_url} if self.last_request_url else {}
-        extra_headers = referer | kwargs.pop('headers', {})
-
-        start = time.perf_counter()
-        for attempt in range(retry + 1):
-            resp = super().request(method, url, *args, headers=extra_headers, **kwargs)
-
-            if resp.status_code not in RETRYABLE_STATUS_CODES or attempt == retry:
-                break
-
-            # Retry after delay
-            time.sleep(RETRY_DELAY)
-        elapsed = time.perf_counter() - start
-
-        parsed = urlparse(url)
-        self.last_request_url = urlunparse(parsed._replace(query='', fragment=''))
-
-        return StealthResponse(resp, elapsed)
+        pass
 
     head = partialmethod(request, 'HEAD')
     get = partialmethod(request, 'GET')
@@ -84,26 +65,7 @@ class AsyncStealthSession(BaseStealthSession, AsyncSession):
         super().__init__(*args, **kwargs)
 
     async def request(self, method: HttpMethod, url: str, *args, retry: int = 0, **kwargs) -> StealthResponse:
-        assert retry >= 0
-
-        referer = {'Referer': self.last_request_url} if self.last_request_url else {}
-        extra_headers = referer | kwargs.pop('headers', {})
-
-        start = time.perf_counter()
-        for attempt in range(retry + 1):
-            resp = await super().request(method, url, *args, headers=extra_headers, **kwargs)
-
-            if resp.status_code not in RETRYABLE_STATUS_CODES or attempt == retry:
-                break
-
-            # Retry after delay
-            await asyncio.sleep(RETRY_DELAY)
-        elapsed = time.perf_counter() - start
-
-        parsed = urlparse(url)
-        self.last_request_url = urlunparse(parsed._replace(query='', fragment=''))
-
-        return StealthResponse(resp, elapsed)
+        pass
 
     head = partialmethod(request, 'HEAD')
     get = partialmethod(request, 'GET')
